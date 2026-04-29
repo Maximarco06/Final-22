@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Seguro</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F6F4EF;
+      --surface: #FFFFFF;
+      --surface2: #EFEDE8;
+      --border: #D8D5CE;
+      --border-dark: #BEBAB0;
+      --text: #1C1B19;
+      --text-muted: #6B6860;
+      --accent: #2D5BE3;
+      --accent-light: #EBF0FD;
+      --accent-dark: #1E3FA0;
+      --danger: #C53030;
+      --danger-light: #FEF0F0;
+      --success: #166534;
+      --success-light: #F0FAF4;
+      --warning: #854F0B;
+      --warning-light: #FAEEDA;
+      --radius: 10px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 8px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      transition: max-width 0.3s ease;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      background: var(--text);
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .brand-mark svg { width: 26px; height: 26px; }
+
+    .brand h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .screen-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.35rem;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .screen-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(45,91,227,0.12);
+    }
+
+    input.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(197,48,48,0.1);
+    }
+
+    .input-hint {
+      font-size: 0.78125rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .input-error {
+      font-size: 0.78125rem;
+      color: var(--danger);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .input-error.visible { display: block; }
+
+    .btn {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active { transform: scale(0.99); }
+
+    .btn-primary {
+      background: var(--text);
+      color: white;
+    }
+
+    .btn-primary:hover { background: #2D2C29; }
+    .btn-primary:disabled { background: var(--border-dark); cursor: not-allowed; transform: none; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      margin-top: 0.6rem;
+    }
+
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 1.25rem 0;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .link-btn:hover { color: var(--accent-dark); }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .alert {
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      margin-bottom: 1.25rem;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .alert.visible { display: block; }
+
+    .alert-danger  { background: var(--danger-light);  color: var(--danger);  border: 1px solid rgba(197,48,48,0.2); }
+    .alert-success { background: var(--success-light); color: var(--success); border: 1px solid rgba(22,101,52,0.2); }
+    .alert-warning { background: var(--warning-light); color: var(--warning); border: 1px solid rgba(133,79,11,0.2); }
+
+    /* NIP grid */
+    .nip-grid {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    .nip-cell {
+      width: 52px;
+      height: 60px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      text-align: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -moz-appearance: textfield;
+    }
+
+    .nip-cell::-webkit-outer-spin-button,
+    .nip-cell::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .nip-cell:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(45,91,227,0.12);
+    }
+
+    .nip-cell.filled { border-color: var(--border-dark); background: var(--surface); }
+    .nip-cell.error  { border-color: var(--danger); }
+
+    /* Timer */
+    .timer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .timer-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Password strength */
+    .strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+
+    /* Dashboard / users */
+    .users-screen { padding: 0; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    .badge-green { background: var(--success-light); color: var(--success); }
+    .badge-blue  { background: var(--accent-light);  color: var(--accent); }
+    .badge-admin { background: #F0E6FF; color: #6B21A8; }
+
+    .users-list { padding: 1rem 1.5rem; }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--surface2);
+    }
+
+    .user-row:last-child { border-bottom: none; }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    .user-info { flex: 1; min-width: 0; }
+
+    .user-name {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .user-email {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .logout-row {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .step-dot.done   { background: var(--text); }
+    .step-dot.active { background: var(--accent); width: 20px; border-radius: 4px; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%  { transform: translateX(-8px); }
+      40%  { transform: translateX(8px); }
+      60%  { transform: translateX(-5px); }
+      80%  { transform: translateX(5px); }
+    }
+
+    .shake { animation: shake 0.4s ease; }
+
+    /* ── Admin panel ── */
+    .admin-stats {
+      padding: 0.65rem 2rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-stats strong { color: var(--text); }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+      padding: 0.75rem 1.5rem 1rem;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .admin-table th {
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 0 8px 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .admin-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--surface2);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:last-child td { border-bottom: none; }
+
+    .btn-sm {
+      padding: 4px 10px;
+      border: none;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-accent-sm { background: var(--accent-light); color: var(--accent); }
+    .btn-accent-sm:hover { background: #d5e0fb; }
+
+    .btn-danger-sm { background: var(--danger-light); color: var(--danger); }
+    .btn-danger-sm:hover { background: #fcd9d9; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(28,27,25,0.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .modal-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .modal-body { font-size: 0.875rem; color: var(--text); line-height: 1.6; }
+
+    .temp-pass-box {
+      margin: 0.75rem 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-family: monospace;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      color: var(--text);
+      text-align: center;
+      word-break: break-all;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+  <div class="container" id="container">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg fill="none" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 3L20 7.5V14C20 17.5 17 20.5 13 22C9 20.5 6 17.5 6 14V7.5L13 3Z" fill="white" fill-opacity="0.9"/>
+          <circle cx="13" cy="13" r="2.5" fill="#1C1B19"/>
+        </svg>
+      </div>
+      <h1>Acceso Seguro</h1>
+      <p>Sistema de autenticación</p>
+    </div>
+
+    <div class="card" id="card">
+
+      <!-- LOGIN -->
+      <div class="screen active" id="screen-login">
+        <div class="step-indicator">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2 class="screen-title">Bienvenido de nuevo</h2>
+        <p class="screen-desc">Ingresa tus credenciales para continuar</p>
+        <div class="alert alert-danger" id="login-error"></div>
+        <div class="form-group">
+          <label for="login-email">Correo electrónico</label>
+          <input type="email" id="login-email" placeholder="tu@correo.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Contraseña</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary" onclick="doLogin()" id="btn-login">Iniciar sesión</button>
+        <div class="divider">o</div>
+        <div class="footer-links">
+          <span>¿No tienes cuenta?</span>
+          <button class="link-btn" onclick="showScreen('screen-register')">Regístrate</button>
+        </div>
+        <div class="footer-links" style="margin-top:0.5rem;">
+          <button class="link-btn" onclick="showScreen('screen-forgot')">¿Olvidaste tu contraseña?</button>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="screen" id="screen-register">
+        <div class="step-indicator">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2 class="screen-title">Crear cuenta</h2>
+        <p class="screen-desc">Completa el formulario para registrarte</p>
+        <div class="alert alert-danger" id="reg-error"></div>
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="reg-name" placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="reg-email" placeholder="tu@correo.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" oninput="checkStrength()">
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+          <p class="input-hint" id="strength-text">Ingresa una contraseña</p>
+        </div>
+        <button class="btn btn-primary" onclick="doRegister()">Crear cuenta</button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-login')">Ya tengo cuenta</button>
+      </div>
+
+      <!-- MFA NIP -->
+      <div class="screen" id="screen-mfa">
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2 class="screen-title">Verificación en dos pasos</h2>
+        <p class="screen-desc">Ingresa el NIP de 6 dígitos que enviamos a <strong id="mfa-email-display"></strong></p>
+        <div class="alert alert-danger" id="mfa-error"></div>
+        <div class="nip-grid" id="nip-grid">
+          <input class="nip-cell" type="number" maxlength="1" id="nip0">
+          <input class="nip-cell" type="number" maxlength="1" id="nip1">
+          <input class="nip-cell" type="number" maxlength="1" id="nip2">
+          <input class="nip-cell" type="number" maxlength="1" id="nip3">
+          <input class="nip-cell" type="number" maxlength="1" id="nip4">
+          <input class="nip-cell" type="number" maxlength="1" id="nip5">
+        </div>
+        <div class="timer-row">
+          <span>El código expira en</span>
+          <span class="timer-badge" id="timer-display">05:00</span>
+        </div>
+        <button class="btn btn-primary" onclick="verifyNIP()" style="margin-top:1.5rem;">Verificar código</button>
+        <button class="btn btn-ghost" onclick="resendNIP()" id="btn-resend" disabled>Reenviar código</button>
+        <div class="footer-links">
+          <button class="link-btn" onclick="showScreen('screen-login')">Volver al inicio</button>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div class="screen" id="screen-forgot">
+        <div class="step-indicator">
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2 class="screen-title">Recuperar contraseña</h2>
+        <p class="screen-desc">Te enviaremos un código de recuperación a tu correo registrado</p>
+        <div class="alert alert-success" id="forgot-success"></div>
+        <div class="alert alert-danger" id="forgot-error"></div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="forgot-email" placeholder="tu@correo.com">
+        </div>
+        <button class="btn btn-primary" onclick="doForgot()">Enviar código</button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-login')">Volver al inicio</button>
+      </div>
+
+      <!-- RESET PASSWORD -->
+      <div class="screen" id="screen-reset">
+        <div class="step-indicator">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h2 class="screen-title">Nuevo código y contraseña</h2>
+        <p class="screen-desc">Ingresa el código enviado y tu nueva contraseña</p>
+        <div class="alert alert-danger" id="reset-error"></div>
+        <div class="alert alert-warning" id="reset-hint"></div>
+        <div class="form-group">
+          <label>Código de recuperación (6 dígitos)</label>
+          <input type="text" id="reset-code" placeholder="000000" maxlength="6">
+        </div>
+        <div class="form-group">
+          <label>Nueva contraseña</label>
+          <input type="password" id="reset-pass1" placeholder="Mínimo 8 caracteres" oninput="checkResetStrength()">
+          <div class="strength-bar"><div class="strength-fill" id="reset-strength-fill"></div></div>
+        </div>
+        <div class="form-group">
+          <label>Confirmar contraseña</label>
+          <input type="password" id="reset-pass2" placeholder="Repite tu contraseña">
+        </div>
+        <button class="btn btn-primary" onclick="doReset()">Cambiar contraseña</button>
+        <button class="btn btn-ghost" onclick="showScreen('screen-forgot')">Reenviar código</button>
+      </div>
+
+      <!-- DASHBOARD (usuarios normales) -->
+      <div class="screen users-screen" id="screen-dashboard">
+        <div class="topbar">
+          <div>
+            <div class="topbar-title">Usuarios registrados</div>
+            <span style="font-size:0.8125rem; color:var(--text-muted);" id="session-user"></span>
+          </div>
+          <span class="badge badge-green">✓ Verificado</span>
+        </div>
+        <div class="users-list" id="users-list"></div>
+        <div class="logout-row">
+          <button class="btn btn-ghost" onclick="doLogout()">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <!-- PANEL DE ADMINISTRADOR -->
+      <div class="screen users-screen" id="screen-admin">
+        <div class="topbar">
+          <div>
+            <div class="topbar-title">Panel de Administrador</div>
+            <span style="font-size:0.8125rem; color:var(--text-muted);">admin@admin.com</span>
+          </div>
+          <span class="badge badge-admin">Admin</span>
+        </div>
+        <div class="admin-stats" id="admin-stats"></div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Fecha registro</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+          </table>
+        </div>
+        <div class="logout-row">
+          <button class="btn btn-ghost" onclick="doLogout()">Cerrar sesión</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal contraseña temporal -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-title">Contraseña temporal generada</div>
+      <div class="modal-body" id="modal-body"></div>
+      <button class="btn btn-primary" style="margin-top:1rem;" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+
+<script>
+emailjs.init("SDkuQyTAqLyDiv7SX");
+
+/* ── Admin (no se guarda en localStorage) ── */
+const ADMIN = { name: 'Administrador', email: 'leonardogglez26@gmail.com', password: 'Admin1234' };
+
+/* ── LocalStorage ── */
+const LS_USERS   = 'auth_users';
+const LS_SESSION = 'auth_session';
+
+function saveUsers()   { localStorage.setItem(LS_USERS, JSON.stringify(store.users)); }
+function saveSession() {
+  if (store.session) localStorage.setItem(LS_SESSION, store.session);
+  else               localStorage.removeItem(LS_SESSION);
+}
+
+/* ── Store ── */
+const DEMO_USERS = [
+  { name: 'Ana García',    email: 'ana@demo.com',    password: 'Demo1234', mfa: true, createdAt: '2024-01-15' },
+  { name: 'Carlos Méndez', email: 'carlos@demo.com', password: 'Demo1234', mfa: true, createdAt: '2024-02-03' },
+];
+
+const _storedUsers = localStorage.getItem(LS_USERS);
+const store = {
+  users:         _storedUsers ? JSON.parse(_storedUsers) : [...DEMO_USERS],
+  session:       localStorage.getItem(LS_SESSION) || null,
+  pendingEmail:  null,
+  mfaCode:       null,
+  mfaExpiry:     null,
+  recoveryCode:  null,
+  recoveryEmail: null,
+  timerInterval: null,
+};
+
+/* ── Utilidades ── */
+function rand6() { return String(Math.floor(100000 + Math.random() * 900000)); }
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  clearAlerts();
+}
+
+function clearAlerts() {
+  document.querySelectorAll('.alert').forEach(a => { a.classList.remove('visible'); a.textContent = ''; });
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function getVal(id) { return document.getElementById(id).value.trim(); }
+
+function shake(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+}
+
+function setAdminLayout(on) {
+  document.getElementById('container').style.maxWidth = on ? '660px' : '';
+}
+
+/* ── Fortaleza contraseña ── */
+function calcStrength(p) {
+  let s = 0;
+  if (p.length >= 8)         s++;
+  if (p.length >= 12)        s++;
+  if (/[A-Z]/.test(p))      s++;
+  if (/[0-9]/.test(p))      s++;
+  if (/[^A-Za-z0-9]/.test(p)) s++;
+  return s;
+}
+
+function applyStrength(fillId, textId, pass) {
+  const s    = calcStrength(pass);
+  const fill = document.getElementById(fillId);
+  fill.style.width = Math.round((s / 5) * 100) + '%';
+  if (s <= 1) {
+    fill.style.background = '#E24B4A';
+    if (textId) document.getElementById(textId).textContent = 'Contraseña débil';
+  } else if (s <= 3) {
+    fill.style.background = '#EF9F27';
+    if (textId) document.getElementById(textId).textContent = 'Contraseña regular';
+  } else {
+    fill.style.background = '#639922';
+    if (textId) document.getElementById(textId).textContent = 'Contraseña fuerte';
+  }
+}
+
+function checkStrength()      { applyStrength('strength-fill',       'strength-text', getVal('reg-pass')); }
+function checkResetStrength() { applyStrength('reset-strength-fill', null,            getVal('reset-pass1')); }
+
+/* ── Registro ── */
+function doRegister() {
+  const name  = getVal('reg-name');
+  const email = getVal('reg-email');
+  const pass  = getVal('reg-pass');
+  if (!name)                                         return showAlert('reg-error', 'Ingresa tu nombre completo.');
+  if (!email || !/\S+@\S+\.\S+/.test(email))        return showAlert('reg-error', 'Ingresa un correo válido.');
+  if (email === ADMIN.email)                         return showAlert('reg-error', 'Este correo no está disponible.');
+  if (pass.length < 8)                              return showAlert('reg-error', 'La contraseña debe tener al menos 8 caracteres.');
+  if (store.users.find(u => u.email === email))     return showAlert('reg-error', 'Este correo ya está registrado.');
+  const createdAt = new Date().toISOString().slice(0, 10);
+  store.users.push({ name, email, password: pass, mfa: true, createdAt });
+  saveUsers();
+  store.pendingEmail = email;
+  launchMFA(email);
+}
+
+/* ── Login ── */
+function doLogin() {
+  const email = getVal('login-email');
+  const pass  = getVal('login-pass');
+  if (email === ADMIN.email && pass === ADMIN.password) {
+    store.pendingEmail = email;
+    launchMFA(email);
+    return;
+  }
+  const user = store.users.find(u => u.email === email && u.password === pass);
+  if (!user) { shake('card'); return showAlert('login-error', 'Correo o contraseña incorrectos.'); }
+  store.pendingEmail = email;
+  launchMFA(email);
+}
+
+/* ── MFA ── */
+function launchMFA(email) {
+  store.mfaCode  = rand6();
+  store.mfaExpiry = Date.now() + 5 * 60 * 1000;
+  document.getElementById('mfa-email-display').textContent = email;
+  const user   = store.users.find(u => u.email === email);
+  const nombre = user ? user.name : (email === ADMIN.email ? ADMIN.name : email);
+  emailjs.send('service_l2z81ve', 'template_q9kw24d', {
+    to_email: email,
+    nombre:   nombre,
+    nip:      store.mfaCode,
+  }).catch(err => console.error('[EmailJS] Error al enviar MFA:', err));
+  console.log('%c[DEV] Código MFA: ' + store.mfaCode, 'background:#2D5BE3;color:#fff;padding:4px 8px;border-radius:4px;');
+  clearNIP();
+  showScreen('screen-mfa');
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(store.timerInterval);
+  document.getElementById('btn-resend').disabled = true;
+  store.timerInterval = setInterval(() => {
+    const remaining = store.mfaExpiry - Date.now();
+    if (remaining <= 0) {
+      clearInterval(store.timerInterval);
+      document.getElementById('timer-display').textContent = '00:00';
+      document.getElementById('btn-resend').disabled = false;
+      return;
+    }
+    const m = Math.floor(remaining / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    document.getElementById('timer-display').textContent =
+      String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }, 1000);
+}
+
+function clearNIP() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('nip' + i);
+    el.value = '';
+    el.classList.remove('filled', 'error');
+  }
+  document.getElementById('nip0').focus();
+}
+
+/* NIP — navegación por teclado */
+document.addEventListener('DOMContentLoaded', () => {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('nip' + i);
+    el.addEventListener('input', e => {
+      const v = e.target.value;
+      if (v.length > 1) e.target.value = v.slice(-1);
+      el.classList.toggle('filled', el.value !== '');
+      if (el.value && i < 5) document.getElementById('nip' + (i + 1)).focus();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById('nip' + (i - 1)).focus();
+      if (e.key === 'Enter') verifyNIP();
+    });
+    el.addEventListener('paste', e => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      for (let j = 0; j < text.length && j + i < 6; j++) {
+        document.getElementById('nip' + (i + j)).value = text[j];
+        document.getElementById('nip' + (i + j)).classList.add('filled');
+      }
+      document.getElementById('nip' + Math.min(i + text.length, 5)).focus();
+    });
+  }
+
+  /* Restaurar sesión al cargar */
+  if (store.session) {
+    if (store.session === ADMIN.email) {
+      renderAdmin();
+      showScreen('screen-admin');
+      setAdminLayout(true);
+    } else {
+      const user = store.users.find(u => u.email === store.session);
+      if (user) {
+        renderDashboard();
+        showScreen('screen-dashboard');
+      } else {
+        store.session = null;
+        saveSession();
+      }
+    }
+  }
+});
+
+function verifyNIP() {
+  const entered = Array.from({ length: 6 }, (_, i) => document.getElementById('nip' + i).value).join('');
+  if (entered.length < 6) return showAlert('mfa-error', 'Ingresa los 6 dígitos del código.');
+  if (Date.now() > store.mfaExpiry) {
+    for (let i = 0; i < 6; i++) document.getElementById('nip' + i).classList.add('error');
+    return showAlert('mfa-error', 'El código ha expirado. Solicita uno nuevo.');
+  }
+  if (entered !== store.mfaCode) {
+    for (let i = 0; i < 6; i++) document.getElementById('nip' + i).classList.add('error');
+    shake('nip-grid');
+    return showAlert('mfa-error', 'Código incorrecto. Inténtalo de nuevo.');
+  }
+  clearInterval(store.timerInterval);
+  store.session = store.pendingEmail;
+  saveSession();
+  if (store.session === ADMIN.email) {
+    renderAdmin();
+    showScreen('screen-admin');
+    setAdminLayout(true);
+  } else {
+    renderDashboard();
+    showScreen('screen-dashboard');
+    setAdminLayout(false);
+  }
+}
+
+function resendNIP() {
+  launchMFA(store.pendingEmail);
+  const el = document.getElementById('mfa-error');
+  el.classList.remove('visible');
+  el.textContent = '';
+}
+
+/* ── Recuperar contraseña ── */
+function doForgot() {
+  const email = getVal('forgot-email');
+  if (!email || !/\S+@\S+\.\S+/.test(email)) return showAlert('forgot-error', 'Ingresa un correo válido.');
+  const user = store.users.find(u => u.email === email);
+  store.recoveryCode  = rand6();
+  store.recoveryEmail = email;
+  const nombre = (user && user.name) ? user.name : email;
+  emailjs.send('service_l2z81ve', 'template_q9kw24d', {
+    to_email: email,
+    nombre:   nombre,
+    nip:      store.recoveryCode,
+  }).catch(err => console.error('[EmailJS] Error al enviar recuperación:', err));
+  console.log('%c[DEV] Código recuperación: ' + store.recoveryCode, 'background:#854F0B;color:#fff;padding:4px 8px;border-radius:4px;');
+  showAlert('forgot-success', user
+    ? 'Código enviado. Revisa tu correo y continúa.'
+    : 'Si ese correo existe, recibirás un código.');
+  document.getElementById('reset-hint').textContent = '💡 Para esta demo, el código aparece en la consola del navegador (F12).';
+  setTimeout(() => showScreen('screen-reset'), 1800);
+}
+
+/* ── Resetear contraseña ── */
+function doReset() {
+  const code = getVal('reset-code');
+  const p1   = getVal('reset-pass1');
+  const p2   = getVal('reset-pass2');
+  if (code !== store.recoveryCode) { shake('card'); return showAlert('reset-error', 'Código incorrecto o expirado.'); }
+  if (p1.length < 8)              return showAlert('reset-error', 'La contraseña debe tener al menos 8 caracteres.');
+  if (p1 !== p2)                  return showAlert('reset-error', 'Las contraseñas no coinciden.');
+  const user = store.users.find(u => u.email === store.recoveryEmail);
+  if (user) { user.password = p1; saveUsers(); }
+  store.recoveryCode  = null;
+  store.recoveryEmail = null;
+  showScreen('screen-login');
+  const loginAlert = document.getElementById('login-error');
+  loginAlert.textContent = '✓ Contraseña actualizada. Inicia sesión.';
+  loginAlert.className   = 'alert alert-success visible';
+}
+
+/* ── Dashboard (usuarios normales) ── */
+function renderDashboard() {
+  const currentUser = store.users.find(u => u.email === store.session);
+  document.getElementById('session-user').textContent = currentUser ? currentUser.name : store.session;
+  const list = document.getElementById('users-list');
+  list.innerHTML = store.users.map(u => {
+    const initials = u.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    return `<div class="user-row">
+      <div class="avatar">${initials}</div>
+      <div class="user-info">
+        <div class="user-name">${escapeHtml(u.name)}${u.email === store.session ? ' <span class="badge badge-blue" style="margin-left:6px;">Tú</span>' : ''}</div>
+        <div class="user-email">${escapeHtml(u.email)}</div>
+      </div>
+      <span class="badge badge-green">MFA ✓</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── Panel administrador ── */
+function renderAdmin() {
+  const total = store.users.length;
+  document.getElementById('admin-stats').innerHTML =
+    `<strong>${total}</strong> usuario${total !== 1 ? 's' : ''} registrado${total !== 1 ? 's' : ''}`;
+
+  document.getElementById('admin-tbody').innerHTML = store.users.map(u => {
+    const initials  = u.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const date      = u.createdAt
+      ? new Date(u.createdAt + 'T00:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+    const safeEmail = escapeHtml(u.email);
+    return `<tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="avatar" style="width:30px;height:30px;font-size:0.72rem;flex-shrink:0;">${initials}</div>
+          <div>
+            <div class="user-name" style="font-size:0.875rem;">${escapeHtml(u.name)}</div>
+            <div class="user-email">${safeEmail}</div>
+          </div>
+        </div>
+      </td>
+      <td style="white-space:nowrap;font-size:0.8rem;color:var(--text-muted);">${date}</td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn-sm btn-accent-sm" onclick="adminResetPassword('${safeEmail}')">Resetear</button>
+          <button class="btn-sm btn-danger-sm" onclick="adminDeleteUser('${safeEmail}')">Eliminar</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function adminDeleteUser(email) {
+  if (!confirm(`¿Eliminar a ${email}?\nEsta acción no se puede deshacer.`)) return;
+  store.users = store.users.filter(u => u.email !== email);
+  saveUsers();
+  renderAdmin();
+}
+
+function adminResetPassword(email) {
+  const chars   = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$';
+  const tmpPass = Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  const user    = store.users.find(u => u.email === email);
+  if (user) { user.password = tmpPass; saveUsers(); }
+  document.getElementById('modal-body').innerHTML = `
+    <p>La contraseña de <strong>${escapeHtml(email)}</strong> ha sido reseteada a:</p>
+    <div class="temp-pass-box">${escapeHtml(tmpPass)}</div>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;">Comparte esta contraseña de forma segura con el usuario.</p>
+  `;
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+}
+
+/* ── Logout ── */
+function doLogout() {
+  store.session     = null;
+  store.pendingEmail = null;
+  saveSession();
+  setAdminLayout(false);
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value  = '';
+  showScreen('screen-login');
+}
+</script>
+</body>
+</html>
