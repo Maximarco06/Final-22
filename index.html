@@ -702,7 +702,7 @@
         <div class="topbar">
           <div>
             <div class="topbar-title">Panel de Administrador</div>
-            <span style="font-size:0.8125rem; color:var(--text-muted);">admin@admin.com</span>
+            <span style="font-size:0.8125rem; color:var(--text-muted);">leonardogglez26@gmail.com</span>
           </div>
           <span class="badge badge-admin">Admin</span>
         </div>
@@ -753,14 +753,17 @@ function saveSession() {
 }
 
 /* ── Store ── */
-const DEMO_USERS = [
-  { name: 'Ana García',    email: 'ana@demo.com',    password: 'Demo1234', mfa: true, createdAt: '2024-01-15' },
-  { name: 'Carlos Méndez', email: 'carlos@demo.com', password: 'Demo1234', mfa: true, createdAt: '2024-02-03' },
-];
+const DEMO_USERS = [];
 
 const _storedUsers = localStorage.getItem(LS_USERS);
+const _legacyEmails = ['ana@demo.com', 'carlos@demo.com'];
+let _parsedUsers = _storedUsers ? JSON.parse(_storedUsers) : [];
+if (_parsedUsers.some(u => _legacyEmails.includes(u.email))) {
+  _parsedUsers = _parsedUsers.filter(u => !_legacyEmails.includes(u.email));
+  localStorage.setItem(LS_USERS, JSON.stringify(_parsedUsers));
+}
 const store = {
-  users:         _storedUsers ? JSON.parse(_storedUsers) : [...DEMO_USERS],
+  users:         _parsedUsers,
   session:       localStorage.getItem(LS_SESSION) || null,
   pendingEmail:  null,
   mfaCode:       null,
